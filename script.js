@@ -43,7 +43,6 @@
           if (callback) callback();
         }
       };
-      // Fallback timer if gtag takes too long
       const timer = setTimeout(done, 500);
 
       window.gtag('event', 'conversion', {
@@ -65,7 +64,7 @@
     return clean.includes(DEV_PHONE_CLEAN) || clean.includes('0578539687');
   }
 
-  // Initialize
+  // Initialize tracking
   initGoogleTag();
 
   // 2. Universal Delegated Click Listener (Capture Phase)
@@ -122,25 +121,55 @@
     });
   });
 
-  // 4. Mobile Menu Toggle
+  // 4. Mobile Drawer, Overlay & Scroll-to-Top Handlers
   document.addEventListener('DOMContentLoaded', function () {
     const toggleBtn = document.querySelector('.mobile-toggle');
     const drawer = document.querySelector('.mobile-nav-drawer');
+    const overlay = document.querySelector('.mobile-overlay');
+    const closeBtn = document.querySelector('.drawer-close');
+    const scrollTopBtn = document.querySelector('.scroll-top-left');
 
-    if (toggleBtn && drawer) {
-      toggleBtn.addEventListener('click', function () {
-        drawer.classList.toggle('open');
+    function openDrawer() {
+      if (drawer) drawer.classList.add('open');
+      if (overlay) overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    if (drawer) {
+      drawer.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', closeDrawer);
+      });
+    }
+
+    // Scroll to Top visibility & click
+    if (scrollTopBtn) {
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 350) {
+          scrollTopBtn.classList.add('visible');
+        } else {
+          scrollTopBtn.classList.remove('visible');
+        }
       });
 
-      // Close when clicking any nav item inside
-      drawer.querySelectorAll('a').forEach(function (a) {
-        a.addEventListener('click', function () {
-          drawer.classList.remove('open');
+      scrollTopBtn.addEventListener('click', function () {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
         });
       });
     }
 
-    // Register Service Worker if present
+    // Register Service Worker safely
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(function () {});
     }
