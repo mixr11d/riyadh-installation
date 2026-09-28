@@ -7,7 +7,23 @@
 (function () {
   'use strict';
 
-  // 1. Google Ads Configuration
+  // 1. إزالة أي Service Worker قديم ومسح الكاش التالف فوراً من جوال الزائر
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+  if ('caches' in window) {
+    caches.keys().then(function (names) {
+      for (let name of names) {
+        caches.delete(name);
+      }
+    });
+  }
+
+  // 2. Google Ads Configuration
   const GOOGLE_ADS_ID = 'AW-XXXXXXXXXXX';
   const CONVERSION_LABEL_CALL = 'XXXXXXXXXXXXXXXXXX';
   const CONVERSION_LABEL_WHATSAPP = 'XXXXXXXXXXXXXXXXXX';
@@ -67,7 +83,7 @@
   // Initialize tracking
   initGoogleTag();
 
-  // 2. Universal Delegated Click Listener (Capture Phase)
+  // 3. Universal Delegated Click Listener (Capture Phase)
   document.addEventListener('click', function (e) {
     const targetLink = e.target.closest('a');
     if (!targetLink) return;
@@ -90,7 +106,7 @@
     }
   }, true);
 
-  // 3. Lead Form Handler & Calculation
+  // 4. Lead Form Handler & Calculation
   document.addEventListener('submit', function (e) {
     const form = e.target.closest('.ajax-lead-form');
     if (!form) return;
@@ -121,7 +137,7 @@
     });
   });
 
-  // 4. Mobile Drawer, Overlay & Scroll-to-Top Handlers
+  // 5. Mobile Drawer, Overlay & Scroll-to-Top Handlers
   document.addEventListener('DOMContentLoaded', function () {
     const toggleBtn = document.querySelector('.mobile-toggle');
     const drawer = document.querySelector('.mobile-nav-drawer');
@@ -151,7 +167,7 @@
       });
     }
 
-    // Scroll to Top visibility & click
+    // Scroll to Top button logic
     if (scrollTopBtn) {
       window.addEventListener('scroll', function () {
         if (window.scrollY > 350) {
@@ -167,11 +183,6 @@
           behavior: 'smooth'
         });
       });
-    }
-
-    // Register Service Worker safely
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(function () {});
     }
   });
 })();
