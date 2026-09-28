@@ -6,9 +6,9 @@
   <title>مظلات وسواتر الرياض | تركيب مظلات وسواتر وبرجولات وساندوتش بانل</title>
   <meta name="description" content="المؤسسة الأولى بالرياض لتركيب مظلات السيارات والحدائق، السواتر المنزلية والشرايح، البرجولات العصرية وملاحق الساندوتش بانل المعزولة. تغطية شاملة لكافة أحياء الرياض.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://riyadh-installation.pages.dev/index.html">
+  <link rel="canonical" href="https://riyadh-installation.pages.dev/">
   
-  <!-- Open Graph / WhatsApp Preview Meta (عرض الشعار بشكل مباشر ورسمي في الواتساب) -->
+  <!-- Open Graph WhatsApp Preview (عرض الشعار بدقة عالية في الواتساب) -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://riyadh-installation.pages.dev/">
   <meta property="og:title" content="مظلات وسواتر الرياض | تركيب مظلات وسواتر وساندوتش بانل">
@@ -22,7 +22,67 @@
   <meta name="twitter:image" content="https://riyadh-installation.pages.dev/preview.png">
   
   <link rel="icon" type="image/png" href="/images/logo.png">
-  <link rel="stylesheet" href="/style.css?v=2.1">
+  <link rel="stylesheet" href="/style.css?v=3.2">
+
+  <!-- حماية فورية تضمن عمل القائمة بنصف الشاشة والشريط العلوي حتى لو كان الكاش قديماً -->
+  <style>
+    .top-promo-bar {
+      background: linear-gradient(90deg, #1d4ed8, #0284c7);
+      color: #ffffff;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .top-promo-bar a {
+      background: #ffffff;
+      color: #1d4ed8;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      text-decoration: none;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .brand-logo {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+      white-space: nowrap !important;
+    }
+    .brand-logo span {
+      white-space: nowrap !important;
+      font-size: 1.05rem !important;
+      font-weight: 800 !important;
+    }
+    .mobile-nav-drawer {
+      width: 75% !important;
+      max-width: 280px !important;
+      right: -100%;
+      transition: right 0.3s ease-in-out !important;
+    }
+    .mobile-nav-drawer.open {
+      right: 0 !important;
+    }
+    .mobile-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .mobile-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
   
   <script type="application/ld+json">
   {
@@ -45,16 +105,22 @@
 </head>
 <body>
 
-  <!-- Site Header (الشعار والعنوان بجانب بعض) -->
+  <!-- شريط الخصم والعروض العلوي بالصفحة الرئيسية -->
+  <div class="top-promo-bar">
+    <span>🔥 عروض الموسم بالرياض: خصم خاص يصل إلى 20% على المظلات والسواتر والبانل + معاينة ورفع مقاسات مجاناً اليوم!</span>
+    <a href="tel:0557589297">اتصل الآن</a>
+  </div>
+
+  <!-- Site Header (الشعار والعنوان بجانب بعض دائماً) -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="index.html" class="brand-logo">
+      <a href="/" class="brand-logo">
         <img src="/images/logo.png" alt="شعار مؤسسة مظلات وسواتر الرياض" width="42" height="42">
         <span>مظلات وسواتر الرياض</span>
       </a>
 
       <nav class="nav-menu" aria-label="القائمة الرئيسية">
-        <a href="index.html" class="nav-link active">الرئيسية</a>
+        <a href="/" class="nav-link active">الرئيسية</a>
         <a href="shades-installation.html" class="nav-link">المظلات</a>
         <a href="fences-installation.html" class="nav-link">السواتر</a>
         <a href="sandwich-panel-installation.html" class="nav-link">ساندوتش بانل</a>
@@ -81,13 +147,14 @@
   <!-- Mobile Overlay Background -->
   <div class="mobile-overlay"></div>
 
-  <!-- Mobile Nav Drawer (تفتح نصف الشاشة فقط) -->
+  <!-- Mobile Nav Drawer (تفتح نصف الشاشة فقط وبشكل ثابت) -->
   <div class="mobile-nav-drawer">
     <div class="drawer-header">
       <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">مظلات وسواتر الرياض</span>
       <button class="drawer-close" aria-label="إغلاق القائمة">&times;</button>
     </div>
-    <a href="index.html" class="active">الرئيسية</a>
+    <!-- الرابط المباشر للرئيسية لمنع الصفحة الرمادية -->
+    <a href="/" class="active">الرئيسية</a>
     <a href="shades-installation.html">مظلات وسيارات</a>
     <a href="fences-installation.html">سواتر منزلية وأسوار</a>
     <a href="sandwich-panel-installation.html">ساندوتش بانل وملاحق</a>
@@ -173,7 +240,7 @@
       </div>
     </section>
 
-    <!-- Services Grid (2 Services Per Row Grid - All Images Verified) -->
+    <!-- Services Grid (2 Services Per Row Grid) -->
     <section class="section-pad">
       <div class="container">
         <div class="section-head">
@@ -235,10 +302,15 @@
             </div>
           </article>
 
-          <!-- Service 3: Sandwich Panel (صورة البانل المصححة بدقة: sandwich-panel-rooms-1_result_result.webp) -->
+          <!-- Service 3: Sandwich Panel (حل المشكلة بمسار دقيق وخاصية الحماية onerror) -->
           <article class="service-card">
             <div class="service-card-media">
-              <img src="/images/sandwich-panel-rooms-1_result_result.webp" alt="بناء غرف وملاحق ساندوتش بانل بالرياض" loading="lazy" width="600" height="350">
+              <img src="/images/sandwich-panel-rooms-1_result_result.webp" 
+                   onerror="this.onerror=null; this.src='/images/sandwich-panel-majlis-1_result_result.webp';" 
+                   alt="بناء غرف وملاحق ساندوتش بانل بالرياض" 
+                   loading="lazy" 
+                   width="600" 
+                   height="350">
               <span class="service-tag">عزل تام للصوت والحرارة</span>
             </div>
             <div class="service-card-body">
@@ -377,7 +449,7 @@
         <div class="footer-col">
           <h3>صفحات الموقع</h3>
           <ul class="footer-links">
-            <li><a href="index.html">الصفحة الرئيسية</a></li>
+            <li><a href="/">الصفحة الرئيسية</a></li>
             <li><a href="shades-installation.html">مظلات السيارات والمنازل</a></li>
             <li><a href="fences-installation.html">سواتر الأحواش والأسوار</a></li>
             <li><a href="sandwich-panel-installation.html">غرف ساندوتش بانل</a></li>
@@ -417,6 +489,6 @@
     <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
   </button>
 
-  <script src="/script.js?v=2.1"></script>
+  <script src="/script.js?v=3.2"></script>
 </body>
 </html>
