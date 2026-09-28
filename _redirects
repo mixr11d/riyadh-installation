@@ -1,0 +1,9 @@
+# Canonical Redirection & Clean URLs
+https://riyadh-installation.pages.dev/home    /index.html    301
+https://riyadh-installation.pages.dev/shades  /shades-installation.html 301
+https://riyadh-installation.pages.dev/fences  /fences-installation.html 301
+https://riyadh-installation.pages.dev/panel   /sandwich-panel-installation.html 301
+https://riyadh-installation.pages.dev/pergola /pergolas-installation.html 301
+
+# Fallback 404 handler
+/*    /404.html    404
