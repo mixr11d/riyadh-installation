@@ -1,0 +1,23 @@
+{
+  "name": "مظلات وسواتر الرياض",
+  "short_name": "مظلات الرياض",
+  "description": "تركيب مظلات، سواتر، برجولات، وساندوتش بانل في مدينة الرياض",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0b1329",
+  "theme_color": "#1d4ed8",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
