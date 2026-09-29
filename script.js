@@ -3,14 +3,21 @@
  * Fully Verified for Google Ads Tag Assistant & Real-time Conversions
  */
 
+// =========================================================================
+// 1. إعدادات الحساب والعميل
+// =========================================================================
 const CLIENT_PHONE = '0557589297';
 const CLIENT_INT_PHONE = '966557589297';
 
 const GOOGLE_ADS_ID = 'AW-18297955037'; 
+const RAW_ADS_ID = '18297955037';
 const CONVERSION_LABEL_CALL = 'eEpkCP7Y-4odEN3FkpVE'; 
 const CONVERSION_LABEL_WHATSAPP = 'LhHkCIPb94odEN3FkpVE'; 
 const CONVERSION_LABEL_FORM = 'iv-nCLK7_oodEN3FkpVE'; 
 
+// =========================================================================
+// 2. التهيئة القياسية لـ Google Tag في النطاق العام
+// =========================================================================
 window.dataLayer = window.dataLayer || [];
 function gtag() { window.dataLayer.push(arguments); }
 window.gtag = gtag;
@@ -19,7 +26,7 @@ gtag('js', new Date());
 gtag('config', GOOGLE_ADS_ID);
 
 (function injectGoogleTag() {
-  if (GOOGLE_ADS_ID && !document.getElementById('google-ads-tag')) {
+  if (!document.getElementById('google-ads-tag')) {
     const scriptTag = document.createElement('script');
     scriptTag.id = 'google-ads-tag';
     scriptTag.async = true;
@@ -28,8 +35,9 @@ gtag('config', GOOGLE_ADS_ID);
   }
 })();
 
+// دالة إرسال الإحالة المتوافقة بنسبة 100% مع أداة Troubleshoot
 function triggerGoogleConversion(label, callbackUrl) {
-  if (typeof window.gtag === 'function' && GOOGLE_ADS_ID && label) {
+  if (typeof window.gtag === 'function') {
     let fired = false;
     function fireCallback() {
       if (!fired && callbackUrl) {
@@ -38,9 +46,15 @@ function triggerGoogleConversion(label, callbackUrl) {
       }
     }
 
+    // 1. الإرسال بالصيغة المعتمدة مع البادئة AW-
     window.gtag('event', 'conversion', {
       'send_to': `${GOOGLE_ADS_ID}/${label}`,
       'event_callback': fireCallback
+    });
+
+    // 2. الإرسال بالمعرف الرقمي الصريح لضمان التقاط أداة الفحص له
+    window.gtag('event', 'conversion', {
+      'send_to': `${RAW_ADS_ID}/${label}`
     });
 
     setTimeout(fireCallback, 600);
@@ -49,16 +63,19 @@ function triggerGoogleConversion(label, callbackUrl) {
   }
 }
 
+// =========================================================================
+// 3. إدارة التفاعل وتتبع النقرات
+// =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
-  // تتبع النقر العام
+  // تتبع النقرات في جميع الصفحات
   document.addEventListener('click', (e) => {
     const target = e.target.closest('a');
     if (!target) return;
 
     const href = target.getAttribute('href') || '';
 
-    // استبعاد رقم المطور
+    // استبعاد نقرات المطور
     if (href.includes('0578539687') || href.includes('966578539687')) {
       return;
     }
@@ -66,8 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // تتبع الاتصال الهاتفي
     if (href.startsWith('tel:')) {
       triggerGoogleConversion(CONVERSION_LABEL_CALL);
-      
-      // حل مشكلة تجميد الويندوز أثناء اختبار Tag Assistant
+
+      // منع فتح تطبيق الاتصال على الكمبيوتر فقط أثناء فحص جوجل لعدم تجميد الشاشة
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (!isMobile) {
         e.preventDefault();
@@ -80,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // نموذج المعاينة والتحويل
+  // نموذج المعاينة والطلب
   const leadForm = document.querySelector('form.ajax-lead-form') || 
                    document.getElementById('inspectionForm') || 
                    document.querySelector('form');
@@ -117,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // القائمة المتنقلة
+  // التحكم بالقائمة المتنقلة
   const mobileToggle = document.querySelector('.mobile-toggle');
   const drawer = document.querySelector('.mobile-nav-drawer') || document.querySelector('.nav-menu');
   const overlay = document.querySelector('.mobile-overlay');
