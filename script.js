@@ -1,25 +1,20 @@
 /**
- * script.js - Universal Lead & Event Engine
- * 100% Script-Only Tracking Architecture (Google Ads AW-18297955037)
- * Zero tracking tags in HTML. Centralized delegate listener.
+ * Universal Precision Google Ads Tracking & Conversion Engine
+ * Fully Compatible with Google Tag Assistant & Production Live Traffic
  */
 
 (function () {
   'use strict';
 
-  // 1. مسح الكاش والـ Service Worker القديم لضمان قراءة أحدث نسخة من الجوال
+  // 1. مسح الكاش القديم من جوال الزائر لضمان عمل أحدث تعديلات
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(function (registrations) {
-      for (let registration of registrations) {
-        registration.unregister();
-      }
+      registrations.forEach(function (r) { r.unregister(); });
     });
   }
   if ('caches' in window) {
     caches.keys().then(function (names) {
-      for (let name of names) {
-        caches.delete(name);
-      }
+      names.forEach(function (name) { caches.delete(name); });
     });
   }
 
@@ -33,165 +28,125 @@
   const CLIENT_PHONE_CLEAN = '966557589297';
   const DEV_PHONE_CLEAN = '966578539687';
 
-  // حقن مكتبة Google Tag Manager
-  function initGoogleTag() {
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      window.dataLayer.push(arguments);
-    }
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', GOOGLE_ADS_ID);
+  // 3. تهيئة وحقن وسم Google Tag فوراً في أعلى الصفحة
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { window.dataLayer.push(arguments); }
+  window.gtag = gtag;
 
+  gtag('js', new Date());
+  gtag('config', GOOGLE_ADS_ID);
+
+  if (!document.getElementById('google-ads-tag')) {
     const script = document.createElement('script');
+    script.id = 'google-ads-tag';
     script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + GOOGLE_ADS_ID;
     document.head.appendChild(script);
   }
 
-  // إرسال الإحالة بأمان مع Callback مضمون
-  function triggerConversion(label, callback) {
+  // 4. الدالة الفورية لإرسال الإحالة بدون أي تعطيل
+  function sendConversion(label) {
     if (typeof window.gtag === 'function') {
-      let fired = false;
-      const done = function () {
-        if (!fired) {
-          fired = true;
-          if (callback) callback();
-        }
-      };
-      const timer = setTimeout(done, 500); // مهلة احتياطية لنصف ثانية
-
       window.gtag('event', 'conversion', {
-        send_to: `${GOOGLE_ADS_ID}/${label}`,
-        event_callback: function () {
-          clearTimeout(timer);
-          done();
-        }
+        'send_to': GOOGLE_ADS_ID + '/' + label,
+        'value': 1.0,
+        'currency': 'SAR'
       });
-    } else if (callback) {
-      callback();
+      console.log('✅ Conversion Fired Successfully:', label);
     }
   }
 
-  // استبعاد نقرات المطور
-  function isDevLink(href) {
-    if (!href) return false;
-    const clean = href.replace(/[^\d]/g, '');
-    return clean.includes(DEV_PHONE_CLEAN) || clean.includes('0578539687');
+  // التحقق من استبعاد رقم المطور
+  function isDeveloperContact(url) {
+    if (!url) return false;
+    const cleanUrl = url.replace(/[^\d]/g, '');
+    return cleanUrl.includes(DEV_PHONE_CLEAN) || cleanUrl.includes('0578539687');
   }
 
-  initGoogleTag();
+  // 5. صائد النقرات الفوري (Instant Global Click Tracker)
+  // يلقط النقرة في اللحظة الأولى للضغط قبل أي انتقال
+  document.addEventListener('pointerdown', handleUserInteraction, true);
+  document.addEventListener('click', handleUserInteraction, true);
 
-  // 3. تتبع النقرات العام لجميع الصفحات
-  document.addEventListener('click', function (e) {
-    const targetLink = e.target.closest('a');
-    if (!targetLink) return;
+  let lastClickTime = 0;
+  function handleUserInteraction(e) {
+    // منع تكرار الإحالة لنفس الضغطة في أقل من 700 جزء من الثانية
+    const now = Date.now();
+    if (now - lastClickTime < 700) return;
 
-    const href = targetLink.getAttribute('href') || '';
+    const link = e.target.closest('a');
+    if (!link) return;
 
-    // تجاهل روابط المطور
-    if (isDevLink(href)) {
-      return;
-    }
+    const href = link.getAttribute('href') || '';
+    if (isDeveloperContact(href)) return;
 
-    // تتبع الاتصال مع تأمين الإرسال
+    // رصد أي رابط اتصال tel: في أي مكان بالصفحة
     if (href.startsWith('tel:')) {
-      e.preventDefault();
-      triggerConversion(CONVERSION_LABEL_CALL, function () {
-        window.location.href = href;
-      });
+      lastClickTime = now;
+      sendConversion(CONVERSION_LABEL_CALL);
     }
 
-    // تتبع الواتساب مع تأمين الإرسال
+    // رصد أي رابط واتساب في أي مكان بالصفحة
     if (href.includes('wa.me') || href.includes('whatsapp.com')) {
-      // إذا كان الرابط يفتح في صفحة جديدة اتركه يفتح ويرسل في الخلفية
-      if (targetLink.target === '_blank') {
-        triggerConversion(CONVERSION_LABEL_WHATSAPP);
-      } else {
-        e.preventDefault();
-        triggerConversion(CONVERSION_LABEL_WHATSAPP, function () {
-          window.location.href = href;
-        });
+      lastClickTime = now;
+      sendConversion(CONVERSION_LABEL_WHATSAPP);
+    }
+  }
+
+  // 6. تتبع نموذج المعاينة والطلب فور الإرسال
+  document.addEventListener('submit', function (e) {
+    const form = e.target.closest('form');
+    if (!form) return;
+
+    // استثناء نماذج البحث العامة إن وجدت
+    if (form.getAttribute('role') === 'search') return;
+
+    // إرسال إحالة النموذج إلى جوجل فوراً
+    sendConversion(CONVERSION_LABEL_FORM);
+
+    // إذا كان النموذج هو نموذج طلب الأسعار المعتاد، نجهّز رسالة الواتساب
+    if (form.classList.contains('ajax-lead-form') || form.id === 'inspectionForm') {
+      e.preventDefault();
+
+      const name = (form.querySelector('[name="name"]') || form.querySelector('#formName') || {}).value || 'عميل';
+      const phone = (form.querySelector('[name="phone"]') || form.querySelector('#formPhone') || {}).value || 'غير محدد';
+      const service = (form.querySelector('[name="service"]') || form.querySelector('#formService') || {}).value || 'طلب تسعير';
+      const district = (form.querySelector('[name="district"]') || form.querySelector('#formDistrict') || {}).value || 'الرياض';
+      const area = (form.querySelector('[name="area"]') || form.querySelector('#formNotes') || {}).value || '';
+
+      let messageText = 'مرحباً مؤسسة الرياض، أود الاستفسار وطلب تسعيرة:%0A' +
+        '👤 الاسم: ' + encodeURIComponent(name) + '%0A' +
+        '📱 الجوال: ' + encodeURIComponent(phone) + '%0A' +
+        '🛠 الخدمة: ' + encodeURIComponent(service) + '%0A' +
+        '📍 الحي: ' + encodeURIComponent(district);
+
+      if (area) {
+        messageText += '%0A📝 الملاحظات/المساحة: ' + encodeURIComponent(area);
       }
+
+      const waUrl = 'https://wa.me/' + CLIENT_PHONE_CLEAN + '?text=' + messageText;
+
+      setTimeout(function () {
+        window.location.href = waUrl;
+      }, 300);
     }
   }, true);
 
-  // 4. معالج نموذج المعاينة
-  document.addEventListener('submit', function (e) {
-    const form = e.target.closest('.ajax-lead-form');
-    if (!form) return;
-
-    e.preventDefault();
-
-    const name = form.querySelector('[name="name"]')?.value || 'عميل';
-    const phone = form.querySelector('[name="phone"]')?.value || 'غير محدد';
-    const service = form.querySelector('[name="service"]')?.value || 'استفسار عام';
-    const area = form.querySelector('[name="area"]')?.value || '';
-    const district = form.querySelector('[name="district"]')?.value || 'الرياض';
-
-    let messageText = `مرحباً مؤسسة الرياض، أود الاستفسار وطلب تسعيرة:%0A` +
-      `👤 الاسم: ${encodeURIComponent(name)}%0A` +
-      `📱 الجوال: ${encodeURIComponent(phone)}%0A` +
-      `🛠 الخدمة: ${encodeURIComponent(service)}%0A` +
-      `📍 الحي: ${encodeURIComponent(district)}`;
-
-    if (area) {
-      messageText += `%0A📐 المساحة التقريبية: ${encodeURIComponent(area)} م²`;
-    }
-
-    const waUrl = `https://wa.me/${CLIENT_PHONE_CLEAN}?text=${messageText}`;
-
-    // إرسال إحالة النموذج ثم التوجيه للواتساب
-    triggerConversion(CONVERSION_LABEL_FORM, function () {
-      window.location.href = waUrl;
-    });
-  });
-
-  // 5. القائمة الجانبية وزر الصعود للأعلى
+  // 7. تحسينات القائمة وواجهة المستخدم
   document.addEventListener('DOMContentLoaded', function () {
     const toggleBtn = document.querySelector('.mobile-toggle');
-    const drawer = document.querySelector('.mobile-nav-drawer');
+    const drawer = document.querySelector('.mobile-nav-drawer') || document.querySelector('.nav-menu');
     const overlay = document.querySelector('.mobile-overlay');
     const closeBtn = document.querySelector('.drawer-close');
-    const scrollTopBtn = document.querySelector('.scroll-top-left');
 
-    function openDrawer() {
-      if (drawer) drawer.classList.add('open');
-      if (overlay) overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
+    function toggleMenu() {
+      if (drawer) drawer.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('active');
     }
 
-    function closeDrawer() {
-      if (drawer) drawer.classList.remove('open');
-      if (overlay) overlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    if (toggleBtn) toggleBtn.addEventListener('click', openDrawer);
-    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
-    if (overlay) overlay.addEventListener('click', closeDrawer);
-
-    if (drawer) {
-      drawer.querySelectorAll('a').forEach(function (a) {
-        a.addEventListener('click', closeDrawer);
-      });
-    }
-
-    if (scrollTopBtn) {
-      window.addEventListener('scroll', function () {
-        if (window.scrollY > 350) {
-          scrollTopBtn.classList.add('visible');
-        } else {
-          scrollTopBtn.classList.remove('visible');
-        }
-      });
-
-      scrollTopBtn.addEventListener('click', function () {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-    }
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleMenu);
+    if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
+    if (overlay) overlay.addEventListener('click', toggleMenu);
   });
+
 })();
