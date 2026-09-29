@@ -3,9 +3,6 @@
  * Fully Verified for Google Ads Tag Assistant & Real-time Conversions
  */
 
-// =========================================================================
-// 1. الإعدادات المركزية لحملة إعلانات جوجل والعميل الحالي
-// =========================================================================
 const CLIENT_PHONE = '0557589297';
 const CLIENT_INT_PHONE = '966557589297';
 
@@ -14,9 +11,6 @@ const CONVERSION_LABEL_CALL = 'eEpkCP7Y-4odEN3FkpVE';
 const CONVERSION_LABEL_WHATSAPP = 'LhHkCIPb94odEN3FkpVE'; 
 const CONVERSION_LABEL_FORM = 'iv-nCLK7_oodEN3FkpVE'; 
 
-// =========================================================================
-// 2. التهيئة القياسية العالمية لـ Google Tag في النطاق العام (Global Scope)
-// =========================================================================
 window.dataLayer = window.dataLayer || [];
 function gtag() { window.dataLayer.push(arguments); }
 window.gtag = gtag;
@@ -24,7 +18,6 @@ window.gtag = gtag;
 gtag('js', new Date());
 gtag('config', GOOGLE_ADS_ID);
 
-// حقن مكتبة Google Tag في الـ Head فوراً
 (function injectGoogleTag() {
   if (GOOGLE_ADS_ID && !document.getElementById('google-ads-tag')) {
     const scriptTag = document.createElement('script');
@@ -35,7 +28,6 @@ gtag('config', GOOGLE_ADS_ID);
   }
 })();
 
-// دالة إرسال الإحالة الرسمية والمعتمدة من Google
 function triggerGoogleConversion(label, callbackUrl) {
   if (typeof window.gtag === 'function' && GOOGLE_ADS_ID && label) {
     let fired = false;
@@ -46,25 +38,20 @@ function triggerGoogleConversion(label, callbackUrl) {
       }
     }
 
-    // إرسال حدث الإحالة القياسي المعتمد لأداة الفحص
     window.gtag('event', 'conversion', {
       'send_to': `${GOOGLE_ADS_ID}/${label}`,
       'event_callback': fireCallback
     });
 
-    // مهلة احتياطية للأمان (Fallback)
     setTimeout(fireCallback, 600);
   } else if (callbackUrl) {
     window.location.href = callbackUrl;
   }
 }
 
-// =========================================================================
-// 3. إدارة التفاعل، الأزرار، ونموذج المعاينة
-// =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
-  // تتبع النقر العام (اتصال / واتساب) في جميع الصفحات
+  // تتبع النقر العام
   document.addEventListener('click', (e) => {
     const target = e.target.closest('a');
     if (!target) return;
@@ -76,9 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // تتبع الاتصال الهاتفي (سواء بدأ بـ 05 أو +966 أو رقم العميل)
+    // تتبع الاتصال الهاتفي
     if (href.startsWith('tel:')) {
       triggerGoogleConversion(CONVERSION_LABEL_CALL);
+      
+      // حل مشكلة تجميد الويندوز أثناء اختبار Tag Assistant
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isMobile) {
+        e.preventDefault();
+      }
     }
 
     // تتبع الواتساب
@@ -107,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // إرسال إحالة النموذج إلى جوجل
       triggerGoogleConversion(CONVERSION_LABEL_FORM);
 
       const msg = `*طلب معاينة وتسعير جديد:*%0A` +
@@ -119,14 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const targetUrl = `https://wa.me/${CLIENT_INT_PHONE}?text=${msg}`;
       
-      // توجيه للواتساب بعد إرسال الإحالة
       setTimeout(() => {
         window.open(targetUrl, '_blank');
       }, 300);
     });
   }
 
-  // التحكم بالقائمة الجانبية للجوال
+  // القائمة المتنقلة
   const mobileToggle = document.querySelector('.mobile-toggle');
   const drawer = document.querySelector('.mobile-nav-drawer') || document.querySelector('.nav-menu');
   const overlay = document.querySelector('.mobile-overlay');
