@@ -1,13 +1,13 @@
 /**
  * script.js - Universal Lead & Event Engine
- * 100% Script-Only Tracking Architecture (Google Ads AW-XXXXXXXXXXX)
+ * 100% Script-Only Tracking Architecture (Google Ads AW-18297955037)
  * Zero tracking tags in HTML. Centralized delegate listener.
  */
 
 (function () {
   'use strict';
 
-  // 1. إزالة أي Service Worker قديم ومسح الكاش التالف فوراً من جوال الزائر
+  // 1. مسح الكاش والـ Service Worker القديم لضمان قراءة أحدث نسخة من الجوال
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(function (registrations) {
       for (let registration of registrations) {
@@ -23,17 +23,17 @@
     });
   }
 
-  // 2. Google Ads Configuration
+  // 2. إعدادات حساب إعلانات جوجل
   const GOOGLE_ADS_ID = 'AW-18297955037';
   const CONVERSION_LABEL_CALL = 'eEpkCP7Y-4odEN3FkpVE';
   const CONVERSION_LABEL_WHATSAPP = 'LhHkCIPb94odEN3FkpVE';
   const CONVERSION_LABEL_FORM = 'iv-nCLK7_oodEN3FkpVE';
 
-  // Verified Client & Developer Phones
+  // أرقام العميل والمطور
   const CLIENT_PHONE_CLEAN = '966557589297';
   const DEV_PHONE_CLEAN = '966578539687';
 
-  // Dynamic injection of Google Tag Manager / gtag.js
+  // حقن مكتبة Google Tag Manager
   function initGoogleTag() {
     window.dataLayer = window.dataLayer || [];
     function gtag() {
@@ -49,7 +49,7 @@
     document.head.appendChild(script);
   }
 
-  // Trigger Google Conversion safely
+  // إرسال الإحالة بأمان مع Callback مضمون
   function triggerConversion(label, callback) {
     if (typeof window.gtag === 'function') {
       let fired = false;
@@ -59,7 +59,7 @@
           if (callback) callback();
         }
       };
-      const timer = setTimeout(done, 500);
+      const timer = setTimeout(done, 500); // مهلة احتياطية لنصف ثانية
 
       window.gtag('event', 'conversion', {
         send_to: `${GOOGLE_ADS_ID}/${label}`,
@@ -73,40 +73,50 @@
     }
   }
 
-  // Check if target link belongs to the developer
+  // استبعاد نقرات المطور
   function isDevLink(href) {
     if (!href) return false;
     const clean = href.replace(/[^\d]/g, '');
     return clean.includes(DEV_PHONE_CLEAN) || clean.includes('0578539687');
   }
 
-  // Initialize tracking
   initGoogleTag();
 
-  // 3. Universal Delegated Click Listener (Capture Phase)
+  // 3. تتبع النقرات العام لجميع الصفحات
   document.addEventListener('click', function (e) {
     const targetLink = e.target.closest('a');
     if (!targetLink) return;
 
     const href = targetLink.getAttribute('href') || '';
 
-    // Ignore developer contact links from tracking
+    // تجاهل روابط المطور
     if (isDevLink(href)) {
       return;
     }
 
-    // Call tracking
+    // تتبع الاتصال مع تأمين الإرسال
     if (href.startsWith('tel:')) {
-      triggerConversion(CONVERSION_LABEL_CALL);
+      e.preventDefault();
+      triggerConversion(CONVERSION_LABEL_CALL, function () {
+        window.location.href = href;
+      });
     }
 
-    // WhatsApp tracking
+    // تتبع الواتساب مع تأمين الإرسال
     if (href.includes('wa.me') || href.includes('whatsapp.com')) {
-      triggerConversion(CONVERSION_LABEL_WHATSAPP);
+      // إذا كان الرابط يفتح في صفحة جديدة اتركه يفتح ويرسل في الخلفية
+      if (targetLink.target === '_blank') {
+        triggerConversion(CONVERSION_LABEL_WHATSAPP);
+      } else {
+        e.preventDefault();
+        triggerConversion(CONVERSION_LABEL_WHATSAPP, function () {
+          window.location.href = href;
+        });
+      }
     }
   }, true);
 
-  // 4. Lead Form Handler & Calculation
+  // 4. معالج نموذج المعاينة
   document.addEventListener('submit', function (e) {
     const form = e.target.closest('.ajax-lead-form');
     if (!form) return;
@@ -131,13 +141,13 @@
 
     const waUrl = `https://wa.me/${CLIENT_PHONE_CLEAN}?text=${messageText}`;
 
-    // Trigger Form Conversion then redirect
+    // إرسال إحالة النموذج ثم التوجيه للواتساب
     triggerConversion(CONVERSION_LABEL_FORM, function () {
       window.location.href = waUrl;
     });
   });
 
-  // 5. Mobile Drawer, Overlay & Scroll-to-Top Handlers
+  // 5. القائمة الجانبية وزر الصعود للأعلى
   document.addEventListener('DOMContentLoaded', function () {
     const toggleBtn = document.querySelector('.mobile-toggle');
     const drawer = document.querySelector('.mobile-nav-drawer');
@@ -167,7 +177,6 @@
       });
     }
 
-    // Scroll to Top button logic
     if (scrollTopBtn) {
       window.addEventListener('scroll', function () {
         if (window.scrollY > 350) {
