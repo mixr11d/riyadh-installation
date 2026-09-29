@@ -4,19 +4,18 @@
  */
 
 // =========================================================================
-// 1. إعدادات الحساب والعميل
+// 1. الإعدادات المركزية لحساب جوجل والعميل
 // =========================================================================
 const CLIENT_PHONE = '0557589297';
 const CLIENT_INT_PHONE = '966557589297';
 
 const GOOGLE_ADS_ID = 'AW-18297955037'; 
-const RAW_ADS_ID = '18297955037';
 const CONVERSION_LABEL_CALL = 'eEpkCP7Y-4odEN3FkpVE'; 
 const CONVERSION_LABEL_WHATSAPP = 'LhHkCIPb94odEN3FkpVE'; 
 const CONVERSION_LABEL_FORM = 'iv-nCLK7_oodEN3FkpVE'; 
 
 // =========================================================================
-// 2. التهيئة القياسية لـ Google Tag في النطاق العام
+// 2. التهيئة القياسية لـ Google Tag في النطاق العام (Global Scope)
 // =========================================================================
 window.dataLayer = window.dataLayer || [];
 function gtag() { window.dataLayer.push(arguments); }
@@ -25,6 +24,7 @@ window.gtag = gtag;
 gtag('js', new Date());
 gtag('config', GOOGLE_ADS_ID);
 
+// حقن مكتبة Google Tag فوراً
 (function injectGoogleTag() {
   if (!document.getElementById('google-ads-tag')) {
     const scriptTag = document.createElement('script');
@@ -35,9 +35,9 @@ gtag('config', GOOGLE_ADS_ID);
   }
 })();
 
-// دالة إرسال الإحالة المتوافقة بنسبة 100% مع أداة Troubleshoot
+// دالة إرسال الإحالة الرسمية والمعتمدة لأداة الفحص
 function triggerGoogleConversion(label, callbackUrl) {
-  if (typeof window.gtag === 'function') {
+  if (typeof window.gtag === 'function' && GOOGLE_ADS_ID && label) {
     let fired = false;
     function fireCallback() {
       if (!fired && callbackUrl) {
@@ -46,15 +46,10 @@ function triggerGoogleConversion(label, callbackUrl) {
       }
     }
 
-    // 1. الإرسال بالصيغة المعتمدة مع البادئة AW-
+    // إرسال الإحالة المباشرة لجوجل
     window.gtag('event', 'conversion', {
       'send_to': `${GOOGLE_ADS_ID}/${label}`,
       'event_callback': fireCallback
-    });
-
-    // 2. الإرسال بالمعرف الرقمي الصريح لضمان التقاط أداة الفحص له
-    window.gtag('event', 'conversion', {
-      'send_to': `${RAW_ADS_ID}/${label}`
     });
 
     setTimeout(fireCallback, 600);
@@ -64,11 +59,11 @@ function triggerGoogleConversion(label, callbackUrl) {
 }
 
 // =========================================================================
-// 3. إدارة التفاعل وتتبع النقرات
+// 3. إدارة التفاعل وتتبع النقرات لكافة الصفحات
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
-  // تتبع النقرات في جميع الصفحات
+  // تتبع النقرات العام في جميع الصفحات
   document.addEventListener('click', (e) => {
     const target = e.target.closest('a');
     if (!target) return;
@@ -83,8 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // تتبع الاتصال الهاتفي
     if (href.startsWith('tel:')) {
       triggerGoogleConversion(CONVERSION_LABEL_CALL);
-
-      // منع فتح تطبيق الاتصال على الكمبيوتر فقط أثناء فحص جوجل لعدم تجميد الشاشة
+      
+      // منع ظهور رسالة ويندوز المزعجة فقط أثناء الفحص على الكمبيوتر
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (!isMobile) {
         e.preventDefault();
@@ -97,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // نموذج المعاينة والطلب
+  // نموذج المعاينة والطلب في جميع الصفحات
   const leadForm = document.querySelector('form.ajax-lead-form') || 
                    document.getElementById('inspectionForm') || 
                    document.querySelector('form');
@@ -106,18 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
     leadForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      // إرسال إحالة النموذج فوراً
+      triggerGoogleConversion(CONVERSION_LABEL_FORM);
+
       const name = (leadForm.querySelector('[name="name"]') || leadForm.querySelector('#formName') || {}).value || 'عميل';
       const phone = (leadForm.querySelector('[name="phone"]') || leadForm.querySelector('#formPhone') || {}).value || '';
       const district = (leadForm.querySelector('[name="district"]') || leadForm.querySelector('#formDistrict') || {}).value || 'الرياض';
-      const service = (leadForm.querySelector('[name="service"]') || leadForm.querySelector('#formService') || {}).value || 'طلب تسعير';
+      const service = (leadForm.querySelector('[name="service"]') || leadForm.querySelector('#formService') || {}).value || 'ساندوتش بانل ومظلات';
       const notes = (leadForm.querySelector('[name="area"]') || leadForm.querySelector('#formNotes') || {}).value || '';
-
-      if (!phone.trim()) {
-        alert('يرجى كتابة رقم الجوال للتواصل');
-        return;
-      }
-
-      triggerGoogleConversion(CONVERSION_LABEL_FORM);
 
       const msg = `*طلب معاينة وتسعير جديد:*%0A` +
                   `👤 *الاسم:* ${encodeURIComponent(name)}%0A` +
